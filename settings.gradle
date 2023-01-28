@@ -1,0 +1,4 @@
+rootProject.name = "GDImageEditorSDKDemo"
+include ':demo'
+include(':imageeditor')
+project(':imageeditor').projectDir = new File('../GDImageEditorSDK/imageeditor')

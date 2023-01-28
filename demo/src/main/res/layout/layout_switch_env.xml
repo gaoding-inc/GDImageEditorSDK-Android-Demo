@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_switch_env"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="切换环境"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+    <!-- 切换环境，单选框 -->
+    <RadioGroup
+        android:id="@+id/rg_change_env"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_env_local"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="local" />
+
+        <RadioButton
+            android:id="@+id/rb_env_dev"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="dev" />
+
+        <RadioButton
+            android:id="@+id/rb_env_fat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="fat" />
+
+        <RadioButton
+            android:id="@+id/rb_env_stage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="stage" />
+
+        <RadioButton
+            android:id="@+id/rb_env_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:paddingLeft="10dp"
+            android:text="product" />
+
+    </RadioGroup>
+
+</LinearLayout>

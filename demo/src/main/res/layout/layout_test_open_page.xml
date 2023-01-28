@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_test_open_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试openPage"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  Path: "
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/et_open_pate_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Query: "
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/et_open_pate_query"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="如:id=123&amp;mode=company" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_confirm_open_page"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="确定"
+        android:textSize="15dp" />
+
+    <Button
+        android:id="@+id/btn_open_tempalte_center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="打开稿定模板中心" />
+
+    <Button
+        android:id="@+id/btn_open_image_editor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开编辑器" />
+
+    <Button
+        android:id="@+id/btn_open_complete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开结果页" />
+
+    <Button
+        android:id="@+id/btn_open_test_on_message_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开on_message测试页" />
+
+</LinearLayout>
