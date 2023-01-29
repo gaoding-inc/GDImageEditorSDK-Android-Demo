@@ -25,7 +25,7 @@ rm -rf demo/build/
 imageeditor="../GDImageEditorSDK/imageeditor"
 
 echo "params: buildType:${buildType}"
-./gradlew assemble${buildType} -x lint
+./gradlew clean assemble${buildType} -x lint
 
 if [ ${buildType}x != "release"x ];then
     echo "cp debug aar to target"

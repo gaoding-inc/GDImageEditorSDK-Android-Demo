@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import com.gaoding.editor.image.api.EditorMode
 import com.gaoding.editor.image.api.GDImageEditorSDK
@@ -14,7 +15,6 @@ import com.gaoding.editor.image.config.GDUrls
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
-
 
 /**
  * demo activity
@@ -27,8 +27,6 @@ class MainActivity : Activity() {
         GDImageEditorSDK(this@MainActivity)
     }
 
-    private var mWorkId: String? = null
-
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +35,7 @@ class MainActivity : Activity() {
         setContentView(binding.root)
         initGDImageEditorSDK()
         initListener()
+        initViews()
     }
 
     /**
@@ -86,13 +85,18 @@ class MainActivity : Activity() {
             }
 
             override fun onEditCompleted(workId: String, sourceId: String, imageUrl: String) {
-                mWorkId = workId
+                // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
+                binding.layoutTestOpenPage.etWorksId.setText(workId)
+                binding.layoutTestOpenPage.etOpenCompleteWorksId.setText(workId)
+                binding.layoutTestOpenPage.etOpenCompleteSourceId.setText(sourceId)
+                binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageUrl)
+
                 // 1. 旧版接口
 //                mImageEditor.openCompletePage(workId, sourceId, imageUrl)
                 // 2. 新版通用接口
                 mImageEditor.openPage(
                     GDUrls.Path.WORKS_COMPLETE, mapOf(
-                        GDUrls.QueryKey.KEY_TEMPLATE_ID to workId,
+                        GDUrls.QueryKey.KEY_WORKS_ID to workId,
                         GDUrls.QueryKey.KEY_SOURCE_ID to sourceId,
                         GDUrls.QueryKey.KEY_IMAGE to imageUrl
                     )
@@ -137,33 +141,53 @@ class MainActivity : Activity() {
      * 2. 以作图记录id的形式打开编辑器
      */
     private fun initOpenImageEditor() {
-        binding.layoutTestOpenPage.btnOpenImageEditor.setOnClickListener {
-            val workId = mWorkId
-            if (workId.isNullOrEmpty()) {
-                // 以指定模版id的形式打开编辑器
-                // 1. 旧版接口
-//                mImageEditor.openImageEditor("14026604557898833", EditorMode.COMPANY)
-                // 2. 新版通用接口
-                // prod: {"mode": "company", "id": 14026604557898833}
-                // fat: {"mode": "company", "id": 16530970696242224}
-                mImageEditor.openPage(
-                    GDUrls.Path.EDITOR, mapOf(
-                        GDUrls.QueryKey.KEY_ID to "14026604557898833",
-                        GDUrls.QueryKey.KEY_MODE to EditorMode.COMPANY.mode
-                    )
-                )
-            } else {
-                // 以作图记录id的形式打开编辑器
-                // 1. 旧版接口
-//                mImageEditor.openImageEditor(workId, EditorMode.USER)
-                // 2. 新版通用接口
-                mImageEditor.openPage(
-                    GDUrls.Path.EDITOR, mapOf(
-                        GDUrls.QueryKey.KEY_ID to workId,
-                        GDUrls.QueryKey.KEY_MODE to EditorMode.USER.mode
-                    )
-                )
+        // 指定模版id打开编辑器
+        binding.layoutTestOpenPage.btnOpenTemplateConfirm.setOnClickListener {
+            // 获取editText输入框中的模板id
+            val templateId = binding.layoutTestOpenPage.etTemplateId.text?.toString()
+                ?: return@setOnClickListener
+
+            if (templateId.isBlank()) {
+                Toast.makeText(this, "模版id不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etTemplateId.requestFocus()
+                return@setOnClickListener
             }
+
+            // 以指定模版id的形式打开编辑器
+            // 1. 旧版接口
+//                mImageEditor.openImageEditor(templateId, EditorMode.COMPANY)
+            // 2. 新版通用接口
+            // prod: {"mode": "company", "id": 14026604557898833}
+            // fat: {"mode": "company", "id": 20359890549361684}
+            mImageEditor.openPage(
+                GDUrls.Path.EDITOR, mapOf(
+                    GDUrls.QueryKey.KEY_ID to templateId,
+                    GDUrls.QueryKey.KEY_MODE to EditorMode.COMPANY.mode
+                )
+            )
+        }
+
+        // 以workId的方式打开编辑器（作图记录再编辑）
+        binding.layoutTestOpenPage.btnOpenWorksConfirm.setOnClickListener {
+            // 获取editText输入框中的模板id
+            val workId =
+                binding.layoutTestOpenPage.etWorksId.text?.toString() ?: return@setOnClickListener
+
+            if (workId.isBlank()) {
+                Toast.makeText(this, "作图记录id不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etWorksId.requestFocus()
+                return@setOnClickListener
+            }
+
+            // 1. 旧版接口
+//                mImageEditor.openImageEditor(workId, EditorMode.USER)
+            // 2. 新版通用接口
+            mImageEditor.openPage(
+                GDUrls.Path.EDITOR, mapOf(
+                    GDUrls.QueryKey.KEY_ID to workId,
+                    GDUrls.QueryKey.KEY_MODE to EditorMode.USER.mode
+                )
+            )
         }
     }
 
@@ -171,18 +195,42 @@ class MainActivity : Activity() {
      * 打开作品完成页
      */
     private fun initOpenComplete() {
-        binding.layoutTestOpenPage.btnOpenComplete.setOnClickListener {
+        binding.layoutTestOpenPage.btnOpenCompleteConfirm.setOnClickListener {
+            val worksId = binding.layoutTestOpenPage.etOpenCompleteWorksId.text?.toString()
+                ?: return@setOnClickListener
+
+            if (worksId.isBlank()) {
+                Toast.makeText(this, "作图记录id不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etOpenCompleteWorksId.requestFocus()
+                return@setOnClickListener
+            }
+
+            val sourceId = binding.layoutTestOpenPage.etOpenCompleteSourceId.text?.toString()
+                ?: return@setOnClickListener
+
+            if (sourceId.isBlank()) {
+                Toast.makeText(this, "源模版id不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etOpenCompleteSourceId.requestFocus()
+                return@setOnClickListener
+            }
+
+            val imageUrl = binding.layoutTestOpenPage.etOpenCompleteImageUrl.text?.toString()
+                ?: return@setOnClickListener
+
+            if (imageUrl.isBlank()) {
+                Toast.makeText(this, "结果图url不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etOpenCompleteImageUrl.requestFocus()
+                return@setOnClickListener
+            }
+
             // 1. 旧版接口
-//            mImageEditor.openCompletePage(
-//                "16519865385752592", "14026604557898833",
-//                "https:\\/\\/gd-filems.dancf.com\\/saas\\/84jbso\\/49573\\/c264858d-fdd0-40ec-89a4-84e95f40463d8327319.png"
-//            )
+//            mImageEditor.openCompletePage(worksId, sourceId,imageUrl)
             // 2. 新版通用接口
             mImageEditor.openPage(
                 GDUrls.Path.WORKS_COMPLETE, mapOf(
-                    GDUrls.QueryKey.KEY_TEMPLATE_ID to "16519865385752592",
-                    GDUrls.QueryKey.KEY_SOURCE_ID to "14026604557898833",
-                    GDUrls.QueryKey.KEY_IMAGE to "https:\\/\\/gd-filems.dancf.com\\/saas\\/84jbso\\/49573\\/c264858d-fdd0-40ec-89a4-84e95f40463d8327319.png"
+                    GDUrls.QueryKey.KEY_WORKS_ID to worksId,
+                    GDUrls.QueryKey.KEY_SOURCE_ID to sourceId,
+                    GDUrls.QueryKey.KEY_IMAGE to imageUrl
                 )
             )
         }
@@ -251,8 +299,30 @@ class MainActivity : Activity() {
     private fun initCustomOpenPage() {
         binding.layoutTestOpenPage.btnConfirmOpenPage.setOnClickListener {
             val path = binding.layoutTestOpenPage.etOpenPatePath.text.toString()
+            if (path.isBlank()) {
+                Toast.makeText(this, "path不能为空", Toast.LENGTH_SHORT).show()
+                binding.layoutTestOpenPage.etOpenPatePath.requestFocus()
+                return@setOnClickListener
+            }
             val queryParams = binding.layoutTestOpenPage.etOpenPateQuery.text.toString()
             mImageEditor.openPage(path, queryParams)
+        }
+    }
+
+    private fun initViews() {
+        // 如果是稿定内部使用，则显示"测试on_message"入口、显示切换环境操作
+        val needShowTestOnMessageBtn = ReadGDInternalConfigUtil.needShowTestOnMessage(this)
+        binding.layoutTestOpenPage.btnOpenTestOnMessagePage.visibility = if (needShowTestOnMessageBtn) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        val needShowSwitchEnv = ReadGDInternalConfigUtil.needShowSwitchEnv(this)
+        binding.layoutSwitchEnv.llSwitchEnv.visibility = if (needShowSwitchEnv) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 

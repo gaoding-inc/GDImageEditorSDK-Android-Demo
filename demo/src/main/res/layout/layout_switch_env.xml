@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_switch_env"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_section"
     android:orientation="vertical">
 
     <TextView
@@ -11,6 +13,13 @@
         android:text="切换环境"
         android:textSize="20dp"
         android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(仅稿定内部开发测试使用，接入方无需关心)"
+        android:textColor="#ff0000"
+        android:textSize="13dp" />
 
     <!-- 切换环境，单选框 -->
     <RadioGroup

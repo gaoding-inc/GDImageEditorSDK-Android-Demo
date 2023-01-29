@@ -82,3 +82,5 @@ lint/tmp/
 target
 
 imageeditor/
+
+GDInternalConfig.json
