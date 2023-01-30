@@ -72,6 +72,5 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
     implementation(name: 'GDImageEditorSDK-release', ext: 'aar')
-//    implementation(name: 'GDImageEditorSDK-debug', ext: 'aar')
 //    implementation project(path: ':imageeditor')
 }

@@ -24,6 +24,15 @@ rm -rf demo/build/
 
 imageeditor="../GDImageEditorSDK/imageeditor"
 
+# 将demo的build.gradle中sdk依赖更新为源码依赖
+echo "update to source dependency"
+annotateSourceDependencyStr="\/\/    implementation project(path: \':imageeditor\')"
+nonAnnotateSourceDependencyStr="    implementation project(path: \':imageeditor\')"
+sed -i "" "s/^${annotateSourceDependencyStr}/${nonAnnotateSourceDependencyStr}/g" demo/build.gradle
+nonAnnotateAarDependencyStr="    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
+annotateAarDependencyStr="\/\/    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
+sed -i "" "s/^${nonAnnotateAarDependencyStr}/${annotateAarDependencyStr}/g" demo/build.gradle
+
 echo "params: buildType:${buildType}"
 ./gradlew clean assemble${buildType} -x lint
 
@@ -40,3 +49,10 @@ fi
 # copy aar to
 rm -rf demo/libs/*
 cp target/public/GDImageEditorSDK-${buildType}.aar demo/libs/
+
+# 将demo的build.gradle中sdk依赖更新为aar依赖
+echo "update to aar dependency"
+sed -i "" "s/^${nonAnnotateSourceDependencyStr}/${annotateSourceDependencyStr}/g" demo/build.gradle
+sed -i "" "s/^${annotateAarDependencyStr}/${nonAnnotateAarDependencyStr}/g" demo/build.gradle
+
+
