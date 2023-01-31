@@ -32,6 +32,9 @@ sed -i "" "s/^${annotateSourceDependencyStr}/${nonAnnotateSourceDependencyStr}/g
 nonAnnotateAarDependencyStr="    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
 annotateAarDependencyStr="\/\/    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
 sed -i "" "s/^${nonAnnotateAarDependencyStr}/${annotateAarDependencyStr}/g" demo/build.gradle
+nonAnnotateVersionDependencyStr="    implementation \"com.gaoding.imageeditor:imageeditor:\${PUBLISH_VERSION}\""
+annotateVersionDependencyStr="\/\/    implementation \"com.gaoding.imageeditor:imageeditor:\${PUBLISH_VERSION}\""
+sed -i "" "s/^${nonAnnotateVersionDependencyStr}/${annotateVersionDependencyStr}/g" demo/build.gradle
 
 echo "params: buildType:${buildType}"
 ./gradlew clean assemble${buildType} -x lint
@@ -54,5 +57,6 @@ cp target/public/GDImageEditorSDK-${buildType}.aar demo/libs/
 echo "update to aar dependency"
 sed -i "" "s/^${nonAnnotateSourceDependencyStr}/${annotateSourceDependencyStr}/g" demo/build.gradle
 sed -i "" "s/^${annotateAarDependencyStr}/${nonAnnotateAarDependencyStr}/g" demo/build.gradle
+#sed -i "" "s/^${annotateVersionDependencyStr}/${nonAnnotateVersionDependencyStr}/g" demo/build.gradle
 
 
