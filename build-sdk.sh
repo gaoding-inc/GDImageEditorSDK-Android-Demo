@@ -29,8 +29,8 @@ echo "update to source dependency"
 annotateSourceDependencyStr="\/\/    implementation project(path: \':imageeditor\')"
 nonAnnotateSourceDependencyStr="    implementation project(path: \':imageeditor\')"
 sed -i "" "s/^${annotateSourceDependencyStr}/${nonAnnotateSourceDependencyStr}/g" demo/build.gradle
-nonAnnotateAarDependencyStr="    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
-annotateAarDependencyStr="\/\/    implementation(name: \'GDImageEditorSDK-release\', ext: \'aar\')"
+nonAnnotateAarDependencyStr="    implementation(name: \"GDImageEditorSDK-release-\${PUBLISH_VERSION}\", ext: \'aar\')"
+annotateAarDependencyStr="\/\/    implementation(name: \"GDImageEditorSDK-release-\${PUBLISH_VERSION}\", ext: \'aar\')"
 sed -i "" "s/^${nonAnnotateAarDependencyStr}/${annotateAarDependencyStr}/g" demo/build.gradle
 nonAnnotateVersionDependencyStr="    implementation \"com.gaoding.imageeditor:imageeditor:\${PUBLISH_VERSION}\""
 annotateVersionDependencyStr="\/\/    implementation \"com.gaoding.imageeditor:imageeditor:\${PUBLISH_VERSION}\""
@@ -39,19 +39,35 @@ sed -i "" "s/^${nonAnnotateVersionDependencyStr}/${annotateVersionDependencyStr}
 echo "params: buildType:${buildType}"
 ./gradlew clean assemble${buildType} -x lint
 
+# 从gradle.properties获取最新发布版本
+PUBLISH_VERSION=1.0.0
+while read LINE
+do
+  if [[ $LINE == PUBLISH_VERSION* ]]
+  then
+    versionLine=$LINE
+    PUBLISH_VERSION=${versionLine:16}
+    echo "hehehe: $LINE"
+  fi
+done < "gradle.properties"
+
+echo "publish version: $PUBLISH_VERSION"
+
+aarName="GDImageEditorSDK-${buildType}-${PUBLISH_VERSION}.aar"
+
 if [ ${buildType}x != "release"x ];then
     echo "cp debug aar to target"
-    cp ${imageeditor}/build/outputs/aar/GDImageEditorSDK-${buildType}.aar target/public/GDImageEditorSDK-${buildType}.aar
+    cp ${imageeditor}/build/outputs/aar/${aarName} target/public/${aarName}
     $(pauseErr)
 else
     echo "cp release aar to target"
-    cp ${imageeditor}/build/outputs/aar/GDImageEditorSDK-${buildType}.aar target/public/GDImageEditorSDK-${buildType}.aar
+    cp ${imageeditor}/build/outputs/aar/${aarName} target/public/${aarName}
     $(pauseErr)
 fi
 
 # copy aar to
 rm -rf demo/libs/*
-cp target/public/GDImageEditorSDK-${buildType}.aar demo/libs/
+cp target/public/${aarName} demo/libs/
 
 # 将demo的build.gradle中sdk依赖更新为aar依赖
 echo "update to aar dependency"
