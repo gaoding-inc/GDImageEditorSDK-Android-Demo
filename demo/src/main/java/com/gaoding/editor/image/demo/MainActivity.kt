@@ -56,6 +56,7 @@ class MainActivity : Activity() {
         mImageEditor.setCallback(object : IGDImageEditorSDKCallback() {
 
             override fun onMessage(type: String, params: Map<String, String>?): String? {
+                // onMessage用于js与接入方通信的通用方法，未来新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
                 // 如果是其他类型，可能需要有返回值，具体业务场景需要具体处理
                 return when (type) {
                     "select_template" -> {
@@ -73,6 +74,7 @@ class MainActivity : Activity() {
             }
 
             override fun onTemplateClick(templateId: String, mode: EditorMode) {
+                // 当用户点击模版中心中的模版回调
                 // 1. 旧版接口
 //                mImageEditor.openImageEditor(templateId, mode)
                 // 2. 新版通用接口
@@ -85,6 +87,7 @@ class MainActivity : Activity() {
             }
 
             override fun onEditCompleted(workId: String, sourceId: String, imageUrl: String) {
+                // 当导出完成时回调
                 // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
                 binding.layoutTestOpenPage.etWorksId.setText(workId)
                 binding.layoutTestOpenPage.etOpenCompleteWorksId.setText(workId)
@@ -104,6 +107,7 @@ class MainActivity : Activity() {
             }
 
             override fun onDownloadEditResult(imageUrl: String) {
+                // 当执行下载下载结果图时回调
                 LogUtils.d(TAG, "onDownloadEditResult:$imageUrl")
             }
 
