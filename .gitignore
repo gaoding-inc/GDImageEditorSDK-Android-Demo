@@ -79,8 +79,6 @@ lint/tmp/
 *.hprof
 
 # Gaoding
-target
-
 imageeditor/
 
 GDInternalConfig.json
