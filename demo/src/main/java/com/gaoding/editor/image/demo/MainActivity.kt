@@ -36,6 +36,7 @@ class MainActivity : Activity() {
         initGDImageEditorSDK()
         initListener()
         initViews()
+        Toast.makeText(this, if (isDebug(this)) "当前是debug" else "当前是release", Toast.LENGTH_SHORT).show()
     }
 
     /**
