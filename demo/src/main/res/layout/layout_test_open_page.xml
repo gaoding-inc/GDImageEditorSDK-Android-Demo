@@ -239,6 +239,61 @@
 
     </LinearLayout>
 
+    <!-- 测试on_message入参和返回值 -->
+    <LinearLayout
+        android:id="@+id/ll_test_on_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_section"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试on_message入参和返回值"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="入参：" />
+
+            <TextView
+                android:id="@+id/tv_on_message_input_params"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="返回值：" />
+
+            <EditText
+                android:id="@+id/et_on_message_output"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="返回值：来自用户返回"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/btn_open_tempalte_center"
         android:layout_width="match_parent"

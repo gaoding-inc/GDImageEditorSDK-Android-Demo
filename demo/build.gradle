@@ -74,4 +74,6 @@ dependencies {
 //    implementation "com.gaoding.imageeditor:imageeditor:${PUBLISH_VERSION}"
     implementation(name: "GDImageEditorSDK-release-${PUBLISH_VERSION}", ext: 'aar')
 //    implementation project(path: ':imageeditor')
+
+    implementation 'com.google.code.gson:gson:2.10.1'
 }

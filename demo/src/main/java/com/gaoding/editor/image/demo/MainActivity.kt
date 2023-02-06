@@ -12,9 +12,11 @@ import com.gaoding.editor.image.api.GDImageEditorSDK
 import com.gaoding.editor.image.api.IGDImageEditorSDKCallback
 import com.gaoding.editor.image.config.GDEnvType
 import com.gaoding.editor.image.config.GDUrls
+import com.gaoding.editor.image.demo.bean.OnMessageModel
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
+import com.google.gson.Gson
 
 /**
  * demo activity
@@ -47,6 +49,16 @@ class MainActivity : Activity() {
                 context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     }
 
+    private fun wrapOnMessageInput(type: String, params: Map<String, String>?): String {
+        // {type: 'select_template', data: xxx}
+        val onMessageModel = OnMessageModel(
+            type = type,
+            data = params
+        )
+
+        return Gson().toJson(onMessageModel)
+    }
+
     /**
      * 初始化GDImageEditorSDK
      */
@@ -59,6 +71,14 @@ class MainActivity : Activity() {
             override fun onMessage(type: String, params: Map<String, String>?): String? {
                 // onMessage用于js与接入方通信的通用方法，未来新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
                 // 如果是其他类型，可能需要有返回值，具体业务场景需要具体处理
+                binding.layoutTestOpenPage.tvOnMessageInputParams.text = wrapOnMessageInput(type, params)
+                // 将输入框的返回值通过sdk返回给js(仅测试使用)
+                val etOnMessageOutput = binding.layoutTestOpenPage.etOnMessageOutput
+                if (etOnMessageOutput.visibility == View.VISIBLE && etOnMessageOutput.text.isNotBlank()) {
+                    val ret = etOnMessageOutput.text.toString()
+                    Toast.makeText(this@MainActivity, ret, Toast.LENGTH_LONG).show()
+                    return ret
+                }
                 return when (type) {
                     "select_template" -> {
                         // 模版中心选择一个模版
@@ -318,6 +338,12 @@ class MainActivity : Activity() {
         // 如果是稿定内部使用，则显示"测试on_message"入口、显示切换环境操作
         val needShowTestOnMessageBtn = ReadGDInternalConfigUtil.needShowTestOnMessage(this)
         binding.layoutTestOpenPage.btnOpenTestOnMessagePage.visibility = if (needShowTestOnMessageBtn) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        binding.layoutTestOpenPage.llTestOnMessage.visibility = if (needShowTestOnMessageBtn) {
             View.VISIBLE
         } else {
             View.GONE
