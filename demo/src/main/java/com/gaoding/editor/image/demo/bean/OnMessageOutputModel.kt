@@ -7,5 +7,5 @@ package com.gaoding.editor.image.demo.bean
  */
 data class OnMessageOutputModel(
     val type: String?,
-    val data: String?
+    val data: Any?
 ): java.io.Serializable
