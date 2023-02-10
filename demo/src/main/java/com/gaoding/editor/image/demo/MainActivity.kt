@@ -12,7 +12,8 @@ import com.gaoding.editor.image.api.GDImageEditorSDK
 import com.gaoding.editor.image.api.IGDImageEditorSDKCallback
 import com.gaoding.editor.image.config.GDEnvType
 import com.gaoding.editor.image.config.GDUrls
-import com.gaoding.editor.image.demo.bean.OnMessageModel
+import com.gaoding.editor.image.demo.bean.OnMessageInputModel
+import com.gaoding.editor.image.demo.bean.OnMessageOutputModel
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
@@ -38,7 +39,8 @@ class MainActivity : Activity() {
         initGDImageEditorSDK()
         initListener()
         initViews()
-        Toast.makeText(this, if (isDebug(this)) "当前是debug" else "当前是release", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, if (isDebug(this)) "当前是debug" else "当前是release", Toast.LENGTH_SHORT)
+            .show()
     }
 
     /**
@@ -51,7 +53,7 @@ class MainActivity : Activity() {
 
     private fun wrapOnMessageInput(type: String, params: Map<String, String>?): String {
         // {type: 'select_template', data: xxx}
-        val onMessageModel = OnMessageModel(
+        val onMessageModel = OnMessageInputModel(
             type = type,
             data = params
         )
@@ -68,16 +70,15 @@ class MainActivity : Activity() {
 
         mImageEditor.setCallback(object : IGDImageEditorSDKCallback() {
 
-            override fun onMessage(type: String, params: Map<String, String>?): String? {
+            override fun onMessage(type: String, params: Map<String, String>?): Any? {
                 // onMessage用于js与接入方通信的通用方法，未来新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
                 // 如果是其他类型，可能需要有返回值，具体业务场景需要具体处理
-                binding.layoutTestOpenPage.tvOnMessageInputParams.text = wrapOnMessageInput(type, params)
+                binding.layoutTestOpenPage.tvOnMessageInputParams.text =
+                    wrapOnMessageInput(type, params)
                 // 将输入框的返回值通过sdk返回给js(仅测试使用)
-                val etOnMessageOutput = binding.layoutTestOpenPage.etOnMessageOutput
-                if (etOnMessageOutput.visibility == View.VISIBLE && etOnMessageOutput.text.isNotBlank()) {
-                    val ret = etOnMessageOutput.text.toString()
-                    Toast.makeText(this@MainActivity, ret, Toast.LENGTH_LONG).show()
-                    return ret
+                getOnMessageOutput()?.let {
+                    Toast.makeText(this@MainActivity, Gson().toJson(it), Toast.LENGTH_LONG).show()
+                    return it
                 }
                 return when (type) {
                     "select_template" -> {
@@ -146,6 +147,33 @@ class MainActivity : Activity() {
                 Toast.makeText(this@MainActivity, "编辑器页面销毁", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    /**
+     * 获取onMessage返回值
+     */
+    private fun getOnMessageOutput(): Any? {
+        if (binding.layoutTestOpenPage.llTestOnMessage.visibility != View.VISIBLE) {
+            return null
+        }
+
+        // 优先获取对象输入框的内容，然后进行反序列化
+        // 如果对象输入框的内容为空或者不合法，则取字符串输入框的内容
+        val etOnMessageOutputObj = binding.layoutTestOpenPage.etOnMessageOutputObject
+        if (etOnMessageOutputObj.text.isNotBlank()) {
+            return try {
+                Gson().fromJson(
+                    etOnMessageOutputObj.text.toString(),
+                    OnMessageOutputModel::class.java
+                )
+            } catch (e: Throwable) {
+                null
+            }
+        } else {
+            // 取字符串输入框
+            val etOnMessageOutputStr = binding.layoutTestOpenPage.etOnMessageOutputStr
+            return etOnMessageOutputStr.text.toString()
+        }
     }
 
     /**
@@ -337,11 +365,12 @@ class MainActivity : Activity() {
     private fun initViews() {
         // 如果是稿定内部使用，则显示"测试on_message"入口、显示切换环境操作
         val needShowTestOnMessageBtn = ReadGDInternalConfigUtil.needShowTestOnMessage(this)
-        binding.layoutTestOpenPage.btnOpenTestOnMessagePage.visibility = if (needShowTestOnMessageBtn) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        binding.layoutTestOpenPage.btnOpenTestOnMessagePage.visibility =
+            if (needShowTestOnMessageBtn) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
 
         binding.layoutTestOpenPage.llTestOnMessage.visibility = if (needShowTestOnMessageBtn) {
             View.VISIBLE

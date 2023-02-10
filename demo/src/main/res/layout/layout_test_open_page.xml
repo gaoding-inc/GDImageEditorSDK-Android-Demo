@@ -280,14 +280,34 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="返回值：" />
+                android:text="返回值(字符串)：" />
 
             <EditText
-                android:id="@+id/et_on_message_output"
+                android:id="@+id/et_on_message_output_str"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="返回值：来自用户返回"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="返回值(指定对象)：" />
+
+            <EditText
+                android:id="@+id/et_on_message_output_object"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="返回值：来自用户返回，必须为{&#34;data&#34;: &#34;xxx&#34;, &#34;type&#34;: &#34;xxx&#34;}"
                 android:textSize="@dimen/edit_text_size" />
 
         </LinearLayout>
