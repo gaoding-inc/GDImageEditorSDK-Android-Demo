@@ -126,6 +126,11 @@ class MainActivity : Activity() {
                         GDUrls.QueryKey.KEY_IMAGE to imageUrl
                     )
                 )
+
+                // 若需要跳转到自定义的页面，可以参考如下逻辑
+//                startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+//                // 关闭编辑器所有页面
+//                mImageEditor.dismiss()
             }
 
             override fun onDownloadEditResult(imageUrl: String) {
