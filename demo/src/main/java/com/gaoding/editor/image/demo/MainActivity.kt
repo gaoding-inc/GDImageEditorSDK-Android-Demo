@@ -70,7 +70,11 @@ class MainActivity : Activity() {
 
         mImageEditor.setCallback(object : IGDImageEditorSDKCallback() {
 
-            override fun onMessage(type: String, params: Map<String, String>?): Any? {
+            override fun onMessage(
+                type: String,
+                params: Map<String, String>?,
+                callback: (Any?) -> Unit
+            ) {
                 // onMessage用于js与接入方通信的通用方法，未来新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
                 // 如果是其他类型，可能需要有返回值，具体业务场景需要具体处理
                 binding.layoutTestOpenPage.tvOnMessageInputParams.text =
@@ -78,20 +82,21 @@ class MainActivity : Activity() {
                 // 将输入框的返回值通过sdk返回给js(仅测试使用)
                 getOnMessageOutput()?.let {
                     Toast.makeText(this@MainActivity, Gson().toJson(it), Toast.LENGTH_LONG).show()
-                    return it
+                    callback(it)
+                    return
                 }
-                return when (type) {
+                when (type) {
                     "select_template" -> {
                         // 模版中心选择一个模版
                         mImageEditor.openPage(GDUrls.Path.EDITOR, params)
-                        null
+                        callback(null)
                     }
                     "editor_edit_complete" -> {
                         // 作图完成
                         mImageEditor.openPage(GDUrls.Path.WORKS_COMPLETE, params)
-                        null
+                        callback(null)
                     }
-                    else -> null
+                    else -> callback(null)
                 }
             }
 
