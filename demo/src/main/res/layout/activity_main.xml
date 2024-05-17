@@ -25,12 +25,6 @@
             android:id="@+id/layout_test_open_page"
             layout="@layout/layout_test_open_page" />
 
-        <Button
-            android:id="@+id/btn_clear_cache"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="清空缓存" />
-
     </LinearLayout>
 
 </ScrollView>

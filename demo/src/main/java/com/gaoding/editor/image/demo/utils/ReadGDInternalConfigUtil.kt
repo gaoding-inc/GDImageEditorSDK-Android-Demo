@@ -1,7 +1,6 @@
-package com.gaoding.editor.image.demo
+package com.gaoding.editor.image.demo.utils
 
 import android.content.Context
-import com.gaoding.editor.image.utils.ReadConfigUtil
 import org.json.JSONObject
 
 /**

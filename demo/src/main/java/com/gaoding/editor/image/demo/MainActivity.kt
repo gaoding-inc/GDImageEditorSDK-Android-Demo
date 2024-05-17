@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import com.gaoding.editor.image.api.EditorMode
+import com.gaoding.editor.image.api.FetchAuthCodeBean
 import com.gaoding.editor.image.api.GDImageEditorSDK
 import com.gaoding.editor.image.api.IGDImageEditorSDKCallback
 import com.gaoding.editor.image.config.GDEnvType
@@ -15,9 +17,12 @@ import com.gaoding.editor.image.config.GDUrls
 import com.gaoding.editor.image.demo.bean.OnMessageInputModel
 import com.gaoding.editor.image.demo.bean.OnMessageOutputModel
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
+import com.gaoding.editor.image.demo.utils.ReadConfigUtil
+import com.gaoding.editor.image.demo.utils.ReadGDInternalConfigUtil
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
 import com.google.gson.Gson
+import org.json.JSONArray
 
 /**
  * demo activity
@@ -86,77 +91,105 @@ class MainActivity : Activity() {
                     return
                 }
                 when (type) {
-                    "select_template" -> {
+                    "template.select" -> {
                         // 模版中心选择一个模版
-                        mImageEditor.openPage(GDUrls.Path.EDITOR, params)
+                        val templateId = params?.get("id") ?: ""
+                        val mode = params?.get("mode")
+                        val editorMode: EditorMode =
+                            if (TextUtils.equals(EditorMode.USER.mode, mode)) {
+                                EditorMode.USER
+                            } else {
+                                EditorMode.TEMPLATE
+                            }
+                        mImageEditor.openPage(
+                            GDUrls.Path.EDITOR,
+                            mapOf(
+                                GDUrls.QueryKey.KEY_ID to templateId,
+                                GDUrls.QueryKey.KEY_MODE to editorMode.mode
+                            )
+                        )
                         callback(null)
                     }
-                    "editor_edit_complete" -> {
-                        // 作图完成
-                        mImageEditor.openPage(GDUrls.Path.WORKS_COMPLETE, params)
+                    "editor.save.complete" -> {
+                        // 作图记录保存完成
+                        val isAutoSave = params?.get("isAutoSave")
+                        val workId = params?.get("workId")
+                        val hasRiskMaterials = params?.get("hasRiskMaterials")
+                        // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
+                        binding.layoutTestOpenPage.etWorksId.setText(workId)
+                        binding.layoutTestOpenPage.etOpenCompleteWorksId.setText(workId)
+
+                        val msg =
+                            "isAutoSave:${isAutoSave},workId${workId},hasRiskMaterials:${hasRiskMaterials}"
+                        LogUtils.d(TAG, msg)
+
+                        // 根据回调的结果，来判断是否继续导出（true：继续，false：中断）
+                        callback(true)
+                    }
+                    "editor.export.complete" -> {
+                        // 导出完成
+                        val workId = params?.get("workId")
+                        val urls = params?.get("urls")
+                        val urlArray = JSONArray(urls)
+                        val imageUrl = urlArray.getString(0) ?: ""
+                        binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageUrl)
+                        LogUtils.d(TAG, "workId:${workId},urls:${imageUrl}")
+
+                        // 若需要跳转到自定义的页面，可以参考如下逻辑
+                        startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                        // 关闭编辑器所有页面
+                        // mImageEditor.dismiss()
+
                         callback(null)
                     }
                     else -> callback(null)
                 }
             }
 
-            override fun onTemplateClick(templateId: String, mode: EditorMode) {
-                // 当用户点击模版中心中的模版回调
-                // 1. 旧版接口
-//                mImageEditor.openImageEditor(templateId, mode)
-                // 2. 新版通用接口
-                mImageEditor.openPage(
-                    GDUrls.Path.EDITOR, mapOf(
-                        GDUrls.QueryKey.KEY_ID to templateId,
-                        GDUrls.QueryKey.KEY_MODE to mode.mode
-                    )
-                )
+            override fun getParamsForFetchAuthCode(): FetchAuthCodeBean? {
+                val akSk = getAkSkFromAssets(this@MainActivity)
+                if (akSk == null) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "GDImageEditorSDKConfiguration.plist ak/sk配置信息读取失败",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return null
+                }
+                val ak = akSk.first
+                val sk = akSk.second
+                return FetchAuthCodeBean(uid = "666", ak = ak, sk = sk)
             }
 
-            override fun onEditCompleted(workId: String, sourceId: String, imageUrl: String) {
-                // 当导出完成时回调
-                // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
-                binding.layoutTestOpenPage.etWorksId.setText(workId)
-                binding.layoutTestOpenPage.etOpenCompleteWorksId.setText(workId)
-                binding.layoutTestOpenPage.etOpenCompleteSourceId.setText(sourceId)
-                binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageUrl)
-
-                // 1. 旧版接口
-//                mImageEditor.openCompletePage(workId, sourceId, imageUrl)
-                // 2. 新版通用接口
-                mImageEditor.openPage(
-                    GDUrls.Path.WORKS_COMPLETE, mapOf(
-                        GDUrls.QueryKey.KEY_WORKS_ID to workId,
-                        GDUrls.QueryKey.KEY_SOURCE_ID to sourceId,
-                        GDUrls.QueryKey.KEY_IMAGE to imageUrl
-                    )
-                )
-
-                // 若需要跳转到自定义的页面，可以参考如下逻辑
-//                startActivity(Intent(this@MainActivity, MainActivity2::class.java))
-//                // 关闭编辑器所有页面
-//                mImageEditor.dismiss()
-            }
-
-            override fun onDownloadEditResult(imageUrl: String) {
-                // 当执行下载下载结果图时回调
-                LogUtils.d(TAG, "onDownloadEditResult:$imageUrl")
-            }
-
-            override fun getUid(): String {
-                // 获取uid，接入方系统内用户唯一标识，稿定系统根据该标识创建关联游客账号。 用于authCode的生成
-                return "666"
-            }
-
-            override fun getAuthCode(context: Context, uid: String, callback: AuthCallback) {
+            override fun getAuthCode(
+                context: Context,
+                authCodeBean: FetchAuthCodeBean?,
+                abilityCode: String,
+                callback: AuthCallback
+            ) {
                 // 可重写该方法，自己实现获取authCode的逻辑
-                super.getAuthCode(context, uid, callback)
+                super.getAuthCode(context, authCodeBean, abilityCode, callback)
             }
 
-            override fun onEditorDestroyed() {
-                Toast.makeText(this@MainActivity, "编辑器页面销毁", Toast.LENGTH_SHORT).show()
+            override fun getPageConfig(): Map<String, Any>? {
+                // 可重写该方法，自己实现要配置的功能，不重写则使用默认配置
+//                 return super.getPageConfig()
+                return mapOf(
+                    // 禁止功能列表
+                    "forbidFunctionList" to arrayOf("template", "size", "watermark"),
+                    // 保存按钮文案
+                    "saveBtnName" to "下载"
+                )
             }
         })
+    }
+
+    /**
+     * 通过assets的plist文件中获取到ak和sk
+     */
+    private fun getAkSkFromAssets(context: Context): Pair<String, String>? {
+        val gdConfig = ReadConfigUtil.read(context) ?: return null
+        return Pair(gdConfig.ak, gdConfig.sk)
     }
 
     /**
@@ -191,9 +224,6 @@ class MainActivity : Activity() {
      */
     private fun initOpenTemplateCenter() {
         binding.layoutTestOpenPage.btnOpenTempalteCenter.setOnClickListener {
-            // 1. 旧版打开模版中心接口
-//            mImageEditor.openTemplateCenter()
-            // 2. 新版通用接口
             mImageEditor.openPage(GDUrls.Path.TEMPLATE_CENTER, null)
         }
     }
@@ -217,15 +247,12 @@ class MainActivity : Activity() {
             }
 
             // 以指定模版id的形式打开编辑器
-            // 1. 旧版接口
-//                mImageEditor.openImageEditor(templateId, EditorMode.COMPANY)
-            // 2. 新版通用接口
             // prod: {"mode": "company", "id": 14026604557898833}
             // fat: {"mode": "company", "id": 20359890549361684}
             mImageEditor.openPage(
                 GDUrls.Path.EDITOR, mapOf(
                     GDUrls.QueryKey.KEY_ID to templateId,
-                    GDUrls.QueryKey.KEY_MODE to EditorMode.COMPANY.mode
+                    GDUrls.QueryKey.KEY_MODE to EditorMode.TEMPLATE.mode
                 )
             )
         }
@@ -242,9 +269,6 @@ class MainActivity : Activity() {
                 return@setOnClickListener
             }
 
-            // 1. 旧版接口
-//                mImageEditor.openImageEditor(workId, EditorMode.USER)
-            // 2. 新版通用接口
             mImageEditor.openPage(
                 GDUrls.Path.EDITOR, mapOf(
                     GDUrls.QueryKey.KEY_ID to workId,
@@ -268,15 +292,6 @@ class MainActivity : Activity() {
                 return@setOnClickListener
             }
 
-            val sourceId = binding.layoutTestOpenPage.etOpenCompleteSourceId.text?.toString()
-                ?: return@setOnClickListener
-
-            if (sourceId.isBlank()) {
-                Toast.makeText(this, "源模版id不能为空", Toast.LENGTH_SHORT).show()
-                binding.layoutTestOpenPage.etOpenCompleteSourceId.requestFocus()
-                return@setOnClickListener
-            }
-
             val imageUrl = binding.layoutTestOpenPage.etOpenCompleteImageUrl.text?.toString()
                 ?: return@setOnClickListener
 
@@ -286,25 +301,9 @@ class MainActivity : Activity() {
                 return@setOnClickListener
             }
 
-            // 1. 旧版接口
-//            mImageEditor.openCompletePage(worksId, sourceId,imageUrl)
-            // 2. 新版通用接口
-            mImageEditor.openPage(
-                GDUrls.Path.WORKS_COMPLETE, mapOf(
-                    GDUrls.QueryKey.KEY_WORKS_ID to worksId,
-                    GDUrls.QueryKey.KEY_SOURCE_ID to sourceId,
-                    GDUrls.QueryKey.KEY_IMAGE to imageUrl
-                )
-            )
+            // 若需要跳转到自定义的页面，可以参考如下逻辑
+            startActivity(Intent(this@MainActivity, MainActivity2::class.java))
         }
-    }
-
-    /**
-     * 清理本地缓存
-     * 本地缓存存放着token等信息
-     */
-    private fun initClearCache() {
-        binding.btnClearCache.setOnClickListener { mImageEditor.clearCache() }
     }
 
     /**
@@ -342,7 +341,6 @@ class MainActivity : Activity() {
         binding.layoutSwitchEnv.rgChangeEnv.setOnCheckedChangeListener { _, checkedId ->
             val envType = rgId2ChangeEnvFunMap[checkedId] ?: return@setOnCheckedChangeListener
             EnvUtil.saveEnv(this, envType)
-            mImageEditor.clearCache()
             // 切换环境最好重启app，这里主要是为了重启MainActivity
             restartApp()
         }
@@ -400,7 +398,6 @@ class MainActivity : Activity() {
         initOpenTemplateCenter()
         initOpenImageEditor()
         initOpenComplete()
-        initClearCache()
         initCustomOpenPage()
 
         // 以下仅稿定内部开发测试使用，接入方客户无需关心
