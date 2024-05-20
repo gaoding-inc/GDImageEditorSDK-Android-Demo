@@ -21,6 +21,85 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="自定义配置"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  AK: "
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/et_ak_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="ak不能为空"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  SK: "
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/et_sk_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="sk不能为空"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" UID: "
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/et_uid_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="uid不能为空"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_section"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="自定义参数"
             android:textSize="15dp"
             android:textStyle="bold" />
@@ -149,7 +228,6 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"

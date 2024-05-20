@@ -147,18 +147,28 @@ class MainActivity : Activity() {
             }
 
             override fun getParamsForFetchAuthCode(): FetchAuthCodeBean? {
-                val akSk = getAkSkFromAssets(this@MainActivity)
-                if (akSk == null) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "GDImageEditorSDKConfiguration.plist ak/sk配置信息读取失败",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return null
+                val etAkContent = binding.layoutTestOpenPage.etAkContent.text?.toString()
+                val etSkContent = binding.layoutTestOpenPage.etSkContent.text?.toString()
+                val etUidContent = binding.layoutTestOpenPage.etUidContent.text?.toString()
+                if (!etAkContent.isNullOrEmpty()
+                    && !etSkContent.isNullOrEmpty()
+                    && !etUidContent.isNullOrEmpty()
+                ) {
+                    return FetchAuthCodeBean(uid = etUidContent, ak = etAkContent, sk = etSkContent)
+                } else {
+                    val akSk = getAkSkFromAssets(this@MainActivity)
+                    if (akSk == null) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "GDImageEditorSDKConfiguration.plist ak/sk配置信息读取失败",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return null
+                    }
+                    val ak = akSk.first
+                    val sk = akSk.second
+                    return FetchAuthCodeBean(uid = "666", ak = ak, sk = sk)
                 }
-                val ak = akSk.first
-                val sk = akSk.second
-                return FetchAuthCodeBean(uid = "666", ak = ak, sk = sk)
             }
 
             override fun getAuthCode(
@@ -176,7 +186,7 @@ class MainActivity : Activity() {
 //                 return super.getPageConfig()
                 return mapOf(
                     // 禁止功能列表
-                    "forbidFunctionList" to arrayOf("template", "size", "watermark"),
+                    "forbidFunctionList" to arrayOf<String>("watermark"),
                     // 保存按钮文案
                     "saveBtnName" to "下载"
                 )
