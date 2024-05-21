@@ -17,11 +17,17 @@ import com.gaoding.editor.image.config.GDUrls
 import com.gaoding.editor.image.demo.bean.OnMessageInputModel
 import com.gaoding.editor.image.demo.bean.OnMessageOutputModel
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
+import com.gaoding.editor.image.demo.utils.FileDownloaderUtil
 import com.gaoding.editor.image.demo.utils.ReadConfigUtil
 import com.gaoding.editor.image.demo.utils.ReadGDInternalConfigUtil
+import com.gaoding.editor.image.demo.widget.LoadingDialog
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
 /**
@@ -37,6 +43,9 @@ class MainActivity : Activity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    // loading
+    private var mLoadingDialog: LoadingDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,6 +53,7 @@ class MainActivity : Activity() {
         initGDImageEditorSDK()
         initListener()
         initViews()
+        FileDownloaderUtil.init(this)
         Toast.makeText(this, if (isDebug(this)) "当前是debug" else "当前是release", Toast.LENGTH_SHORT)
             .show()
     }
@@ -127,20 +137,36 @@ class MainActivity : Activity() {
                         callback(true)
                     }
                     "editor.export.complete" -> {
-                        // 导出完成
-                        val workId = params?.get("workId")
-                        val urls = params?.get("urls")
-                        val urlArray = JSONArray(urls)
-                        val imageUrl = urlArray.getString(0) ?: ""
-                        binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageUrl)
-                        LogUtils.d(TAG, "workId:${workId},urls:${imageUrl}")
+                        GlobalScope.launch(Dispatchers.Main) {
+                            // 导出完成
+                            val workId = params?.get("workId")
+                            val urls = params?.get("urls")
+                            val urlArray = JSONArray(urls)
+                            val urlList = arrayListOf<String>()
+                            for (index in 0 until urlArray.length()) {
+                                urlList.add(urlArray.getString(index))
+                            }
 
-                        // 若需要跳转到自定义的页面，可以参考如下逻辑
-                        startActivity(Intent(this@MainActivity, MainActivity2::class.java))
-                        // 关闭编辑器所有页面
-                        // mImageEditor.dismiss()
+                            // 在输入框中展示第一张图片链接
+                            val imageFirstUrl = urlList[0]
+                            binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageFirstUrl)
 
-                        callback(null)
+                            // 保存到相册
+                            showLoadingDialog()
+                            withContext(Dispatchers.IO) {
+                                urlList.forEach {
+                                    FileDownloaderUtil.downloadFileToAlbum(this@MainActivity, it)
+                                }
+                            }
+                            dismissLoadingDialog()
+
+                            // 若需要跳转到自定义的页面，可以参考如下逻辑
+                            startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                            // 关闭编辑器所有页面
+                            mImageEditor.dismiss()
+
+                            callback(null)
+                        }
                     }
                     else -> callback(null)
                 }
@@ -413,6 +439,29 @@ class MainActivity : Activity() {
         // 以下仅稿定内部开发测试使用，接入方客户无需关心
         initChangeEnv()
         initTestOnMessage()
+    }
+
+    private fun showLoadingDialog() {
+        if (mLoadingDialog != null && mLoadingDialog?.isShowing == true) {
+            return
+        }
+
+        if (mLoadingDialog == null) {
+            mLoadingDialog = LoadingDialog(
+                mImageEditor.getTopImageEditorActivity(),
+                "保存相册中"
+            )
+            mLoadingDialog?.setShowCancel(true)
+            mLoadingDialog?.setOnCancelListener { dismissLoadingDialog() }
+        }
+        mLoadingDialog?.show()
+    }
+
+    private fun dismissLoadingDialog() {
+        if (mLoadingDialog != null && mLoadingDialog?.isShowing == true) {
+            mLoadingDialog?.dismiss()
+            mLoadingDialog = null
+        }
     }
 
     companion object {

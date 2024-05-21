@@ -12,8 +12,6 @@ import java.io.InputStreamReader
 
 /**
  * 读取配置文件（assets目录下的GDImageEditorSDKConfiguration.json）工具类
- * Created by kongran on 2023/1/12
- * E-Mail Address：kongran@gaoding.com
  */
 object ReadConfigUtil {
 

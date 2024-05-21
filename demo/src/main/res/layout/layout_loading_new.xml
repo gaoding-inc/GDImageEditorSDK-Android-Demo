@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/gd_content"
+        android:layout_width="128dp"
+        android:layout_height="172dp"
+        android:layout_centerInParent="true">
+
+        <LinearLayout
+            android:id="@+id/gd_bg_line"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/gd_bg_top"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@drawable/shape_radius4_black_loading_top_bg" />
+
+            <View
+                android:id="@+id/gd_bg"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/shape_radius4_black_loading_center_bg" />
+
+            <View
+                android:id="@+id/gd_bg_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@drawable/shape_radius4_black_loading_bottom_bg" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gd_progress_content"
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.gaoding.editor.image.demo.widget.MaterialProgressBar
+                    android:id="@+id/gd_progressbar"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="24dp"
+                    android:visibility="visible" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/gd_tv_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/gd_loading"
+                android:textColor="@color/gd_white"
+                android:textSize="15dp"
+                tools:text="加载中" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/gd_rl_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_below="@id/gd_progress_content"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentTop="true"
+                android:background="@color/gd_white10" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/gd_cancel"
+                android:textColor="@color/gd_white"
+                android:textSize="15dp"
+                tools:text="取消" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

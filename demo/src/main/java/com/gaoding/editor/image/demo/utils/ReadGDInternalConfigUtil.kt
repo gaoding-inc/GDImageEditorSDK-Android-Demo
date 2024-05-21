@@ -5,8 +5,6 @@ import org.json.JSONObject
 
 /**
  * 读取稿定内部开发测试配置工具类
- * Created by kongran on 2023/1/29
- * E-Mail Address：kongran@gaoding.com
  */
 object ReadGDInternalConfigUtil {
 
