@@ -20,6 +20,7 @@ import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
 import com.gaoding.editor.image.demo.utils.FileDownloaderUtil
 import com.gaoding.editor.image.demo.utils.ReadConfigUtil
 import com.gaoding.editor.image.demo.utils.ReadGDInternalConfigUtil
+import com.gaoding.editor.image.demo.utils.SPUtils
 import com.gaoding.editor.image.demo.widget.LoadingDialog
 import com.gaoding.editor.image.utils.EnvUtil
 import com.gaoding.editor.image.utils.LogUtils
@@ -41,6 +42,11 @@ class MainActivity : Activity() {
         GDImageEditorSDK(this@MainActivity)
     }
 
+    // sp存储
+    private val mSPUtils by lazy {
+        SPUtils.getInstance(applicationContext, SP_NAME)
+    }
+
     private lateinit var binding: ActivityMainBinding
 
     // loading
@@ -53,6 +59,7 @@ class MainActivity : Activity() {
         initGDImageEditorSDK()
         initListener()
         initViews()
+        initData()
         FileDownloaderUtil.init(this)
         Toast.makeText(this, if (isDebug(this)) "当前是debug" else "当前是release", Toast.LENGTH_SHORT)
             .show()
@@ -406,6 +413,30 @@ class MainActivity : Activity() {
         }
     }
 
+    /**
+     * 保存自定义参数
+     */
+    private fun initSaveParams() {
+        binding.layoutTestOpenPage.btnConfirmParams.setOnClickListener {
+            saveParams()
+        }
+    }
+
+    private fun initData() {
+        val ak = mSPUtils.getString(AK_KEY, "")
+        val sk = mSPUtils.getString(SK_KEY, "")
+        val uid = mSPUtils.getString(UID_KEY, "")
+        if (ak.isNotEmpty()) {
+            binding.layoutTestOpenPage.etAkContent.setText(ak)
+        }
+        if (sk.isNotEmpty()) {
+            binding.layoutTestOpenPage.etSkContent.setText(sk)
+        }
+        if (uid.isNotEmpty()) {
+            binding.layoutTestOpenPage.etUidContent.setText(uid)
+        }
+    }
+
     private fun initViews() {
         // 如果是稿定内部使用，则显示"测试on_message"入口、显示切换环境操作
         val needShowTestOnMessageBtn = ReadGDInternalConfigUtil.needShowTestOnMessage(this)
@@ -435,6 +466,7 @@ class MainActivity : Activity() {
         initOpenImageEditor()
         initOpenComplete()
         initCustomOpenPage()
+        initSaveParams()
 
         // 以下仅稿定内部开发测试使用，接入方客户无需关心
         initChangeEnv()
@@ -464,7 +496,20 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun saveParams() {
+        val etAkContent = binding.layoutTestOpenPage.etAkContent.text?.toString() ?: ""
+        val etSkContent = binding.layoutTestOpenPage.etSkContent.text?.toString() ?: ""
+        val etUidContent = binding.layoutTestOpenPage.etUidContent.text?.toString() ?: ""
+        mSPUtils.put(AK_KEY, etAkContent)
+        mSPUtils.put(SK_KEY, etSkContent)
+        mSPUtils.put(UID_KEY, etUidContent)
+    }
+
     companion object {
         private const val TAG = "MainActivity"
+        const val SP_NAME = "image_editor_demo"
+        const val AK_KEY = "AK"
+        const val SK_KEY = "SK"
+        const val UID_KEY = "UID"
     }
 }
