@@ -71,16 +71,6 @@ class MainActivity : Activity() {
                 context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     }
 
-    private fun wrapOnMessageInput(type: String, params: Map<String, String>?): String {
-        // {type: 'select_template', data: xxx}
-        val onMessageModel = OnMessageInputModel(
-            type = type,
-            data = params
-        )
-
-        return Gson().toJson(onMessageModel)
-    }
-
     /**
      * 初始化GDImageEditorSDK
      */
@@ -133,9 +123,7 @@ class MainActivity : Activity() {
                         // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
                         binding.layoutTestOpenPage.etWorksId.setText(workId)
 
-                        val msg =
-                            "isAutoSave:${isAutoSave},workId${workId},hasRiskMaterials:${hasRiskMaterials}"
-                        LogUtils.d(TAG, msg)
+                        // 可以在这里进行控制是否继续导出的逻辑，如弹出付费弹窗等
 
                         // 根据回调的结果，来判断是否继续导出（true：继续，false：中断）
                         callback(true)
@@ -151,7 +139,7 @@ class MainActivity : Activity() {
                                 urlList.add(urlArray.getString(index))
                             }
 
-                            // 保存到相册
+                            // 下载保存到相册
                             showLoadingDialog()
                             withContext(Dispatchers.IO) {
                                 urlList.forEach {
@@ -160,7 +148,8 @@ class MainActivity : Activity() {
                             }
                             dismissLoadingDialog()
 
-                            // 若需要跳转到自定义的页面，可以参考如下逻辑
+                            // 导出完成后，可以自定义跳转到指定页面，如完成页等
+                            // 跳转到自定义的页面，可以参考如下逻辑
                             startActivity(Intent(this@MainActivity, MainActivity2::class.java))
                             // 关闭编辑器所有页面
                             mImageEditor.dismiss()
@@ -207,6 +196,16 @@ class MainActivity : Activity() {
                 )
             }
         })
+    }
+
+    private fun wrapOnMessageInput(type: String, params: Map<String, String>?): String {
+        // {type: 'select_template', data: xxx}
+        val onMessageModel = OnMessageInputModel(
+            type = type,
+            data = params
+        )
+
+        return Gson().toJson(onMessageModel)
     }
 
     /**
