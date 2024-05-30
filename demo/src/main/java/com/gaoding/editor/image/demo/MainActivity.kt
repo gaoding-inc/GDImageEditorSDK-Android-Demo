@@ -18,8 +18,6 @@ import com.gaoding.editor.image.demo.bean.OnMessageInputModel
 import com.gaoding.editor.image.demo.bean.OnMessageOutputModel
 import com.gaoding.editor.image.demo.databinding.ActivityMainBinding
 import com.gaoding.editor.image.demo.utils.FileDownloaderUtil
-import com.gaoding.editor.image.demo.utils.ReadConfigUtil
-import com.gaoding.editor.image.demo.utils.ReadGDInternalConfigUtil
 import com.gaoding.editor.image.demo.utils.SPUtils
 import com.gaoding.editor.image.demo.widget.LoadingDialog
 import com.gaoding.editor.image.utils.EnvUtil
@@ -97,7 +95,7 @@ class MainActivity : Activity() {
                 params: Map<String, String>?,
                 callback: (Any?) -> Unit
             ) {
-                // onMessage用于js与接入方通信的通用方法，未来新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
+                // onMessage用于js与接入方通信的通用方法，新增接口会使用onMessage进行通信，这样可以避免频繁升级SDK
                 // 如果是其他类型，可能需要有返回值，具体业务场景需要具体处理
                 binding.layoutTestOpenPage.tvOnMessageInputParams.text =
                     wrapOnMessageInput(type, params)
@@ -134,7 +132,6 @@ class MainActivity : Activity() {
                         val hasRiskMaterials = params?.get("hasRiskMaterials")
                         // 作图完成之后将作图记录id设置到作图记录id输入框中，同时将sourceId和imageUrl也设置到"打开结果页"的对应输入框中
                         binding.layoutTestOpenPage.etWorksId.setText(workId)
-                        binding.layoutTestOpenPage.etOpenCompleteWorksId.setText(workId)
 
                         val msg =
                             "isAutoSave:${isAutoSave},workId${workId},hasRiskMaterials:${hasRiskMaterials}"
@@ -153,10 +150,6 @@ class MainActivity : Activity() {
                             for (index in 0 until urlArray.length()) {
                                 urlList.add(urlArray.getString(index))
                             }
-
-                            // 在输入框中展示第一张图片链接
-                            val imageFirstUrl = urlList[0]
-                            binding.layoutTestOpenPage.etOpenCompleteImageUrl.setText(imageFirstUrl)
 
                             // 保存到相册
                             showLoadingDialog()
@@ -183,24 +176,13 @@ class MainActivity : Activity() {
                 val etAkContent = binding.layoutTestOpenPage.etAkContent.text?.toString()
                 val etSkContent = binding.layoutTestOpenPage.etSkContent.text?.toString()
                 val etUidContent = binding.layoutTestOpenPage.etUidContent.text?.toString()
-                if (!etAkContent.isNullOrEmpty()
+                return if (!etAkContent.isNullOrEmpty()
                     && !etSkContent.isNullOrEmpty()
                     && !etUidContent.isNullOrEmpty()
                 ) {
-                    return FetchAuthCodeBean(uid = etUidContent, ak = etAkContent, sk = etSkContent)
+                    FetchAuthCodeBean(uid = etUidContent, ak = etAkContent, sk = etSkContent)
                 } else {
-                    val akSk = getAkSkFromAssets(this@MainActivity)
-                    if (akSk == null) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "GDImageEditorSDKConfiguration.plist ak/sk配置信息读取失败",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return null
-                    }
-                    val ak = akSk.first
-                    val sk = akSk.second
-                    return FetchAuthCodeBean(uid = "666", ak = ak, sk = sk)
+                    FetchAuthCodeBean(uid = "666", ak = "您的ak值", sk = "您的sk值")
                 }
             }
 
@@ -225,14 +207,6 @@ class MainActivity : Activity() {
                 )
             }
         })
-    }
-
-    /**
-     * 通过assets的plist文件中获取到ak和sk
-     */
-    private fun getAkSkFromAssets(context: Context): Pair<String, String>? {
-        val gdConfig = ReadConfigUtil.read(context) ?: return null
-        return Pair(gdConfig.ak, gdConfig.sk)
     }
 
     /**
@@ -318,34 +292,6 @@ class MainActivity : Activity() {
                     GDUrls.QueryKey.KEY_MODE to EditorMode.USER.mode
                 )
             )
-        }
-    }
-
-    /**
-     * 打开作品完成页
-     */
-    private fun initOpenComplete() {
-        binding.layoutTestOpenPage.btnOpenCompleteConfirm.setOnClickListener {
-            val worksId = binding.layoutTestOpenPage.etOpenCompleteWorksId.text?.toString()
-                ?: return@setOnClickListener
-
-            if (worksId.isBlank()) {
-                Toast.makeText(this, "作图记录id不能为空", Toast.LENGTH_SHORT).show()
-                binding.layoutTestOpenPage.etOpenCompleteWorksId.requestFocus()
-                return@setOnClickListener
-            }
-
-            val imageUrl = binding.layoutTestOpenPage.etOpenCompleteImageUrl.text?.toString()
-                ?: return@setOnClickListener
-
-            if (imageUrl.isBlank()) {
-                Toast.makeText(this, "结果图url不能为空", Toast.LENGTH_SHORT).show()
-                binding.layoutTestOpenPage.etOpenCompleteImageUrl.requestFocus()
-                return@setOnClickListener
-            }
-
-            // 若需要跳转到自定义的页面，可以参考如下逻辑
-            startActivity(Intent(this@MainActivity, MainActivity2::class.java))
         }
     }
 
@@ -439,21 +385,21 @@ class MainActivity : Activity() {
 
     private fun initViews() {
         // 如果是稿定内部使用，则显示"测试on_message"入口、显示切换环境操作
-        val needShowTestOnMessageBtn = ReadGDInternalConfigUtil.needShowTestOnMessage(this)
+        val needShowTestOnMessageBtn = false
         binding.layoutTestOpenPage.btnOpenTestOnMessagePage.visibility =
             if (needShowTestOnMessageBtn) {
                 View.VISIBLE
             } else {
                 View.GONE
             }
-
         binding.layoutTestOpenPage.llTestOnMessage.visibility = if (needShowTestOnMessageBtn) {
             View.VISIBLE
         } else {
             View.GONE
         }
+        binding.layoutTestOpenPage.llCustomParams.visibility = View.GONE
 
-        val needShowSwitchEnv = ReadGDInternalConfigUtil.needShowSwitchEnv(this)
+        val needShowSwitchEnv = false
         binding.layoutSwitchEnv.llSwitchEnv.visibility = if (needShowSwitchEnv) {
             View.VISIBLE
         } else {
@@ -464,7 +410,6 @@ class MainActivity : Activity() {
     private fun initListener() {
         initOpenTemplateCenter()
         initOpenImageEditor()
-        initOpenComplete()
         initCustomOpenPage()
         initSaveParams()
 

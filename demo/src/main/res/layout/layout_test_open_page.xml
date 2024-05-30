@@ -13,6 +13,7 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:id="@+id/ll_custom_params"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_section"
@@ -236,73 +237,6 @@
                 android:text="确定" />
 
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_section"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="打开完成页"
-            android:textSize="15dp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="作图记录id：" />
-
-            <EditText
-                android:id="@+id/et_open_complete_works_id"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="请输入作图记录id"
-                android:inputType="number"
-                android:textSize="@dimen/edit_text_size" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="结果图url：" />
-
-            <EditText
-                android:id="@+id/et_open_complete_image_url"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="请输入结果图url"
-                android:textSize="@dimen/edit_text_size" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_open_complete_confirm"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:padding="5dp"
-            android:text="确定"
-            android:textSize="15dp" />
 
     </LinearLayout>
 
