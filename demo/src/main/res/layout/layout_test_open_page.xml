@@ -89,6 +89,48 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="模板中心配置代码: "
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/et_center_code_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="模板中心的code"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="编辑器配置代码: "
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/et_editor_code_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="编辑器的code"
+                android:textSize="@dimen/edit_text_size" />
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/btn_confirm_params"
             android:layout_width="100dp"
@@ -200,7 +242,7 @@
                 android:layout_weight="1"
                 android:hint="请输入模版id"
                 android:inputType="number"
-                android:text="107006"
+                android:text="112724"
                 android:textSize="@dimen/edit_text_size" />
 
             <Button

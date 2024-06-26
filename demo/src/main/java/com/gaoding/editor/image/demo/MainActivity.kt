@@ -106,11 +106,14 @@ class MainActivity : Activity() {
                             } else {
                                 EditorMode.TEMPLATE
                             }
+                        val code =
+                            binding.layoutTestOpenPage.etEditorCodeContent.text?.toString() ?: ""
                         mImageEditor.openPage(
                             GDUrls.Path.EDITOR,
                             mapOf(
                                 GDUrls.QueryKey.KEY_ID to templateId,
-                                GDUrls.QueryKey.KEY_MODE to editorMode.mode
+                                GDUrls.QueryKey.KEY_MODE to editorMode.mode,
+                                GDUrls.QueryKey.KEY_CONFIG_CODE to "您的后台配置代码",
                             )
                         )
                         callback(null)
@@ -240,7 +243,12 @@ class MainActivity : Activity() {
      */
     private fun initOpenTemplateCenter() {
         binding.layoutTestOpenPage.btnOpenTempalteCenter.setOnClickListener {
-            mImageEditor.openPage(GDUrls.Path.TEMPLATE_CENTER, null)
+            val code = binding.layoutTestOpenPage.etCenterCodeContent.text?.toString() ?: ""
+            mImageEditor.openPage(
+                GDUrls.Path.TEMPLATE_CENTER, mapOf(
+                    GDUrls.QueryKey.KEY_CONFIG_CODE to "您的后台配置代码",
+                )
+            )
         }
     }
 
@@ -261,6 +269,7 @@ class MainActivity : Activity() {
                 binding.layoutTestOpenPage.etTemplateId.requestFocus()
                 return@setOnClickListener
             }
+            val code = binding.layoutTestOpenPage.etEditorCodeContent.text?.toString() ?: ""
 
             // 以指定模版id的形式打开编辑器
             // prod: {"mode": "company", "id": 14026604557898833}
@@ -268,7 +277,8 @@ class MainActivity : Activity() {
             mImageEditor.openPage(
                 GDUrls.Path.EDITOR, mapOf(
                     GDUrls.QueryKey.KEY_ID to templateId,
-                    GDUrls.QueryKey.KEY_MODE to EditorMode.TEMPLATE.mode
+                    GDUrls.QueryKey.KEY_MODE to EditorMode.TEMPLATE.mode,
+                    GDUrls.QueryKey.KEY_CONFIG_CODE to "您的后台配置代码",
                 )
             )
         }
@@ -371,6 +381,8 @@ class MainActivity : Activity() {
         val ak = mSPUtils.getString(AK_KEY, "")
         val sk = mSPUtils.getString(SK_KEY, "")
         val uid = mSPUtils.getString(UID_KEY, "")
+        val centerCode = mSPUtils.getString(CENTER_CODE_KEY, "")
+        val editorCode = mSPUtils.getString(EDITOR_CODE_KEY, "")
         if (ak.isNotEmpty()) {
             binding.layoutTestOpenPage.etAkContent.setText(ak)
         }
@@ -379,6 +391,12 @@ class MainActivity : Activity() {
         }
         if (uid.isNotEmpty()) {
             binding.layoutTestOpenPage.etUidContent.setText(uid)
+        }
+        if (centerCode.isNotEmpty()) {
+            binding.layoutTestOpenPage.etCenterCodeContent.setText(centerCode)
+        }
+        if (editorCode.isNotEmpty()) {
+            binding.layoutTestOpenPage.etEditorCodeContent.setText(editorCode)
         }
     }
 
@@ -396,10 +414,14 @@ class MainActivity : Activity() {
         } else {
             View.GONE
         }
-        binding.layoutTestOpenPage.llCustomParams.visibility = View.GONE
 
         val needShowSwitchEnv = false
         binding.layoutSwitchEnv.llSwitchEnv.visibility = if (needShowSwitchEnv) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+        binding.layoutTestOpenPage.llCustomParams.visibility = if (needShowSwitchEnv) {
             View.VISIBLE
         } else {
             View.GONE
@@ -444,9 +466,15 @@ class MainActivity : Activity() {
         val etAkContent = binding.layoutTestOpenPage.etAkContent.text?.toString() ?: ""
         val etSkContent = binding.layoutTestOpenPage.etSkContent.text?.toString() ?: ""
         val etUidContent = binding.layoutTestOpenPage.etUidContent.text?.toString() ?: ""
+        val etCenterCodeContent =
+            binding.layoutTestOpenPage.etCenterCodeContent.text?.toString() ?: ""
+        val etEditorCodeContent =
+            binding.layoutTestOpenPage.etEditorCodeContent.text?.toString() ?: ""
         mSPUtils.put(AK_KEY, etAkContent)
         mSPUtils.put(SK_KEY, etSkContent)
         mSPUtils.put(UID_KEY, etUidContent)
+        mSPUtils.put(CENTER_CODE_KEY, etCenterCodeContent)
+        mSPUtils.put(EDITOR_CODE_KEY, etEditorCodeContent)
     }
 
     companion object {
@@ -455,5 +483,7 @@ class MainActivity : Activity() {
         const val AK_KEY = "AK"
         const val SK_KEY = "SK"
         const val UID_KEY = "UID"
+        const val CENTER_CODE_KEY = "CENTER_CODE"
+        const val EDITOR_CODE_KEY = "EDITOR_CODE"
     }
 }
