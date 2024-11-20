@@ -280,6 +280,34 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="图片地址：" />
+
+            <EditText
+                android:id="@+id/et_image_path"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="请输入图片地址"
+                android:inputType="number"
+                android:textSize="@dimen/edit_text_size"
+                android:text="https://gdesign-dam.dancf.com/30412943065070663/517cd416f0754acb953748589e25b1f0.jpg"/>
+
+            <Button
+                android:id="@+id/btn_open_image_confirm"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="确定" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- 测试on_message入参和返回值 -->

@@ -185,7 +185,11 @@ class MainActivity : Activity() {
                 callback: AuthCallback
             ) {
                 // 可重写该方法，自己实现获取authCode的逻辑
-                super.getAuthCode(context, authCodeBean, abilityCode, callback)
+                // 重写就不需要在getParamsForFetchAuthCode方法中配置ak、sk信息
+                // 不重写直接使用super，配合getParamsForFetchAuthCode就可以了
+                // super.getAuthCode(context, authCodeBean, abilityCode, callback)
+                // 自定义，则需要通过callback.onSuccess传递code和uid
+                callback.onSuccess("授权code","用户id")
             }
 
             override fun getPageConfig(): Map<String, Any>? {
@@ -299,6 +303,17 @@ class MainActivity : Activity() {
                 GDUrls.Path.EDITOR, mapOf(
                     GDUrls.QueryKey.KEY_ID to workId,
                     GDUrls.QueryKey.KEY_MODE to EditorMode.USER.mode
+                )
+            )
+        }
+
+        binding.layoutTestOpenPage.btnOpenImageConfirm.setOnClickListener {
+            val imagePath =  binding.layoutTestOpenPage.etImagePath.text?.toString() ?: return@setOnClickListener
+            mImageEditor.openPage(
+                GDUrls.Path.EDITOR, mapOf(
+                    GDUrls.QueryKey.KEY_MODE to "create_with_image",
+                    "editor_type" to "plog",
+                    "imagePath" to imagePath,
                 )
             )
         }
